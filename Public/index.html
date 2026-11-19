@@ -1,1 +1,187 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>🚀 SPEED IA ♾️ — Studio Premium</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div id="api-modal" class="modal" hidden>
+    <div class="modal-card">
+      <h2>🔑 Clés API Agnès</h2>
+      <p class="modal-desc">Ajoutez jusqu'à 8 clés (Agent Plan) pour répartir la consommation de vos crédits.</p>
+      
+      <div id="keys-container" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
+        <input type="password" class="input-field key-input" placeholder="Collez votre clé Agnès (Agent Plan)…" autocomplete="off">
+      </div>
+
+      <button id="add-key-btn" class="btn-secondary btn-small" style="margin-top: 10px;">+ Ajouter une autre clé (Max 8)</button>
+
+      <p class="modal-wakeup" style="margin-top: 15px;">☕️ <strong>Premier démarrage :</strong> l'app peut mettre jusqu'à <strong>1 minute</strong> à se réveiller (serveur Render).</p>
+      
+      <div id="api-key-status" class="api-status"></div>
+      
+      <div class="modal-actions" style="margin-top: 10px;">
+        <button id="api-key-save" class="btn-primary">Valider &amp; continuer</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <header class="header">
+      <div class="header-top">
+        <div class="logo">🚀 SPEED IA ♾️</div>
+        <button id="api-key-btn" class="api-btn" title="Gérer les clés API">
+          <span class="api-dot" id="api-dot"></span> 🔑
+        </button>
+      </div>
+      <p class="tagline">Chat • Image • Vidéo</p>
+      <div class="wakeup-banner" id="wakeup-banner">
+        <span>☕️</span>
+        <span>Le serveur peut mettre jusqu'à <strong>1 minute</strong> à se réveiller au premier démarrage. Laissez l'app se réveiller, ne cliquez pas plusieurs fois.</span>
+        <button id="wakeup-banner-close" aria-label="Fermer">×</button>
+      </div>
+    </header>
+
+    <div class="tabs">
+      <button id="tab-chat"  class="tab-btn active">💬 Chat</button>
+      <button id="tab-image" class="tab-btn">🖼️ Image</button>
+      <button id="tab-video" class="tab-btn">🎬 Vidéo</button>
+    </div>
+
+    <main class="main">
+      <section id="section-chat" class="section active">
+        <div class="chat-layout">
+          <aside class="chat-sidebar" id="chat-sidebar">
+            <button id="new-chat-btn" class="btn-secondary" style="width:100%; margin-bottom:10px;">+ Nouvelle conversation</button>
+            <div id="chat-sessions-list" class="sessions-list"></div>
+          </aside>
+          <div class="chat-main">
+            <div id="chat-history" class="chat-history"></div>
+            <div class="chat-input-area">
+              <input type="file" id="chat-image-upload" accept="image/*" hidden>
+              <button id="chat-image-btn" class="btn-secondary" style="padding: 10px 14px; border-radius: 50%;">📷</button>
+              <textarea id="chat-input" placeholder="Envoyez un message…" rows="1"></textarea>
+              <button id="chat-send" class="btn-primary">⬆️</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-image" class="section">
+        <div class="info-banner info-banner-warning">
+          <span class="info-icon">⚠️</span>
+          <p>
+            <strong>Ne spammez pas le bouton « Générer ».</strong> En cas de message d'erreur, ne recliquez pas.
+            Faites dans cet ordre : <strong>1)</strong> Actualisez la page (Render / App),
+            <strong>2)</strong> Attendez <strong>1 minute</strong>,
+            <strong>3)</strong> Relancez une génération.
+          </p>
+        </div>
+        <div class="card">
+          <textarea id="image-prompt" class="input-field" rows="3" placeholder="Décrivez l'image à générer…"></textarea>
+          
+          <div class="upload-area">
+            <input type="file" id="image-upload" accept="image/*" hidden>
+            <button id="image-upload-btn" class="btn-secondary">📷 Image de référence</button>
+            <div id="image-preview" class="preview"></div>
+          </div>
+
+          <label style="font-size: 13px; color: var(--text-dim); font-weight: 600; margin-top: 5px;">Style / Skill de génération</label>
+          <select id="image-skill" class="input-field">
+            <option value="default">Standard</option>
+            <option value="photorealistic">📸 Photographie Ultra-Réaliste</option>
+            <option value="cinematic">🎬 Cinéma Hollywoodien</option>
+            <option value="portrait">👤 Portrait Studio (Peau réaliste)</option>
+            <option value="anime">🎨 Anime / Manga 3D</option>
+            <option value="3d">🧊 Rendu 3D (Octane Render)</option>
+          </select>
+
+          <select id="image-format" class="input-field">
+            <option value="9:16">Portrait (9:16)</option>
+            <option value="16:9">Large (16:9)</option>
+            <option value="1:1">Carré (1:1)</option>
+          </select>
+          
+          <select id="image-quality" class="input-field">
+            <option value="1K">Qualité Standard (1K)</option>
+            <option value="2K">Haute Définition (2K)</option>
+            <option value="4K">Ultra HD (4K)</option>
+          </select>
+          
+          <button id="image-generate" class="btn-primary">Générer l'image</button>
+        </div>
+        <div id="image-result-area" class="result-area" hidden>
+          <img id="image-result" src="" alt="Résultat">
+          <a id="image-download" class="btn-download" download>Télécharger</a>
+        </div>
+        <div class="history-section">
+          <h3>Historique des images</h3>
+          <div id="image-history" class="history-grid"></div>
+        </div>
+      </section>
+
+      <section id="section-video" class="section">
+        <div class="info-banner info-banner-warning" style="background: rgba(255, 69, 58, 0.1); border-color: rgba(255, 69, 58, 0.3);">
+          <span class="info-icon">⚠️</span>
+          <p>
+            <strong>Attention à vos crédits Agent Plan :</strong> La génération vidéo consomme beaucoup de crédits. Privilégiez le format 720p et surveillez votre solde sur votre console Agnes AI.
+          </p>
+        </div>
+        <div class="video-slots" id="video-slots"></div>
+        <div class="history-section">
+          <h3>Bibliothèque vidéo</h3>
+          <div id="video-history" class="history-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <template id="slot-template">
+    <div class="slot card">
+      <div class="slot-header">
+        <span class="slot-num">#1</span>
+        <span class="slot-status" data-state="idle"><span class="dot"></span> En attente</span>
+      </div>
+      <textarea class="slot-prompt input-field" rows="3" placeholder="Prompt vidéo…"></textarea>
+      <div class="slot-image-area" style="display: flex; gap: 10px; align-items: center; margin: 10px 0;">
+        <input type="file" class="slot-img-input" accept="image/*" hidden>
+        <button class="slot-img-btn btn-secondary btn-small" type="button">📷 Ajouter une image</button>
+        <div class="slot-img-preview-container" style="display: none; width: 40px; height: 40px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border);">
+          <img class="slot-img-preview" src="" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+      </div>
+      
+      <div class="slot-options" style="display: flex; gap: 8px; margin-bottom: 8px;">
+        <select class="slot-format input-field"><option value="9:16">9:16</option><option value="16:9" selected>16:9</option><option value="1:1">1:1</option></select>
+        <select class="slot-duration input-field"><option value="4">4s</option><option value="8">8s</option><option value="12" selected>12s</option></select>
+      </div>
+      
+      <select class="slot-skill input-field" style="margin-bottom: 10px; font-size: 13px;">
+        <option value="default">Style Standard</option>
+        <option value="cinematic">🎬 Cinéma Hollywoodien</option>
+        <option value="action">💥 Action Rapide</option>
+        <option value="drone">🚁 Vue Drone / Aérienne</option>
+        <option value="documentary">📹 Documentaire</option>
+        <option value="anime">🎨 Anime / Manga</option>
+      </select>
+      
+      <div class="slot-actions" style="margin-top: 10px;">
+        <button class="slot-gen-btn btn-primary" type="button">Générer</button>
+        <button class="slot-dl-btn btn-download" type="button" disabled>Télécharger</button>
+      </div>
+      <div class="slot-player" hidden style="margin-top: 10px;"><video controls playsinline style="width: 100%; border-radius: 8px;"></video></div>
+    </div>
+  </template>
+
+  <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+  
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+  
+  <script src="app.js"></script>
+</body>
+</html>
